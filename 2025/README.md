@@ -3,11 +3,13 @@ This project contains two `Tekla Structures 2025` macros:
 
 ## ExportToExcel
 Exports member information (ID, Name, Section, Start/End points, Comment) to an Excel file `Desktop\Model.xlsx`.
-See the [Model.xlsx](#Modelxlsx) section for details on the exported data format.
+See the [Members](#Members) section for details on the exported data format. 
+
+Note, you can run [Macro2](docs/xlsx/Macro2.xlsm) inside `Desktop\Model.xlsx` to generate `Connections` sheet.
 
 ## ImportFromExcel
-Reads connections from an Excel file `Desktop\Connections.xlsx` and creates connections between members in Tekla.
-See the [Connections.xlsx](#Connectionsxlsx) section for details on the exported data format.
+Reads connections from an Excel file `Desktop\Model.xlsx` and creates connections between members in Tekla based on `Connections` sheet.
+See the [Connections Sheet](#Connections) section for details on the exported data format.
 
 ## Install Software
 
@@ -18,30 +20,34 @@ See the [Connections.xlsx](#Connectionsxlsx) section for details on the exported
 
 - Open desrired model e.g. `YourModelName` in `Tekla Structures 2025`
 - Create 2 macros `ExportToExcel` and `ImportFromExcel` in Tekla Structures 2025
+- Either download this git repo or its zip from GitHub
 - Paste [`modeling`](docs/modeling) folder under `docs/modeling` in this repo to `C:\TeklaStructuresModels\<YourModelName>\macros\modeling`
-
+- Or paste it under `C:\Users\YourUsername\AppData\Local\Trimble\Tekla Structures\version\Macros\` to be used globally across all models
 
 ## Run macros
 - Go to `Edit` > `Components` > `Applications & Components` > `Search for your macro name`
 - Double click `ExportToExcel` or `ImportFromExcel` in `Tekla Structures 2025` to run macros
 
-## Excel Format
+## Model Excel File
 
-### Model.xlsx
+This file is an output of [ExportToExcel](#ExportToExcel) Tekla macro.
 
-| ID     | Name | Profile | StartX | StartY | StartZ | EndX | EndY | EndZ | Comment |
-| ------ | ---- | ------- | ------ | ------ | ------ | ---- | ---- | ---- | ------- |
-| GUID-1 | B1   | W200X42 | 0.0    | 0.0    | 0.0    | 4000 | 0.0  | 0.0  | Column  |
-| GUID-2 | B2   | W250X53 | 0.0    | 0.0    | 3000   | 4000 | 0.0  | 3000 | Beam    |
+### Members
+| ID    | Name   | Section             | Start_X | Start_Y | Start_Z | End_X | End_Y | End_Z | Comment |
+|-------|--------|---------------------|---------|---------|---------|-------|-------|-------|---------|
+| 28771 | BEAM   | WI300-15-20*300     | 14400   | 24000   | 7200    | 7200  | 24000 | 7200  |         |
+| 28605 | COLUMN | WI300-15-20*300     | 7200    | 24000   | -500    | 7200  | 24000 | 7200  |         |
+| 26930 | COLUMN | WI300-15-20*300     | 14400   | 24000   | -500    | 14400 | 24000 | 7200  | Splice  |
 
 
-### Connections.xlsx
+### Connections
+This file is an output of when you run Excel macro [Macro2](docs/xlsx/Macro2.xlsm).
 
-| ID1    | ID2    | ConnectionType | AttributeFile | Selected |
-| ------ | ------ | -------------- | ------------- | -------- |
-| GUID-1 | GUID-2 | EndPlate       | MyEndPlate    | yes      |
-| GUID-3 | GUID-4 | BasePlate      |               | yes      |
-| ...    | ...    | ...            | ...           |          |
+| Preliminary ID | Pre. Name | Pre. Section        | Pre. Comment | Secondary ID | Sec. Name | Sec. Section        | Sec. Comment | Mid-Connection | Connection Type |
+|----------------|-----------|---------------------|--------------|---------------|-----------|---------------------|---------------|----------------|-----------------|
+| 28605          | COLUMN    | WI300-15-20*300     |              | 28771         | BEAM      | WI300-15-20*300     |               | 119            |                 |
+| 26930          | COLUMN    | WI300-15-20*300     |              | 28771         | BEAM      | WI300-15-20*300     |               | 119            |                 |
+
 
 Only rows with a non-empty `Selected` field (e.g. `Yes`, `yes` or `X`) will be processed.  
 
@@ -53,4 +59,3 @@ Only rows with a non-empty `Selected` field (e.g. `Yes`, `yes` or `X`) will be p
 - **StartX, StartY, StartZ**: Start point coordinates of the part.
 - **EndX, EndY, EndZ**: End point coordinates of the part.
 - **Comment**: Any custom comment from a UDA (optional).
-- **Selected**: *(Initially blank)* – to be filled by the user in Excel later. If filled (e.g., "Yes"), the part is considered selected for connection creation in Macro 2.
